@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GKD TIMECARD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #121212;
+            color: #E0E0E0;
+            display: flex;
+            margin: 0;
+            height: 100vh;
+        }
+
+        .main-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .timer-display {
+            font-size: 6rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .task-input {
+            width: 80%;
+            max-width: 400px;
+            padding: 10px;
+            font-size: 1.2rem;
+            text-align: center;
+            border: 2px solid #333;
+            background-color: #1E1E1E;
+            color: #E0E0E0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .start-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .stop-btn {
+            background-color: #F44336;
+            color: white;
+        }
+
+        .break-btn {
+            background-color: #FFC107;
+            color: black;
+        }
+
+        .sidebar {
+            width: 350px;
+            background-color: #1E1E1E;
+            padding: 20px;
+            overflow-y: auto;
+            border-left: 2px solid #333;
+        }
+
+        .sidebar h2, .sidebar h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #444;
+            padding-bottom: 10px;
+        }
+
+        .summary p {
+            font-size: 1.1rem;
+            margin: 10px 0;
+        }
+
+        .summary-header, .history-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        #today-list, .history-list, #previous-tasks-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        #today-list li, #previous-tasks-list li, .history-item {
+            background-color: #2E2E2E;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #previous-tasks-list li, .history-date {
+            cursor: pointer;
+        }
+
+        .clear-btn, .history-btn {
+            background-color: #FF5722;
+            color: white;
+            font-size: 0.8rem;
+            padding: 8px 12px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .history-date {
+            background-color: #383838;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .history-list {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="timer-display" id="timer-display">00:00:00</div>
+        <input type="text" id="task-name" class="task-input" placeholder="Enter task name" list="task-options">
+        <datalist id="task-options"></datalist>
+        <div class="controls">
+            <button id="start-btn" class="btn start-btn">Start</button>
+            <button id="stop-btn" class="btn stop-btn" style="display:none;">Stop</button>
+            <button id="break-btn" class="btn break-btn" style="display:none;">Break</button>
+        </div>
+    </div>
+    <div class="sidebar">
+        <div class="history-controls">
+            <button id="today-view-btn" class="btn history-btn">Today</button>
+            <button id="history-view-btn" class="btn history-btn">History</button>
+        </div>
+        
+        <div id="today-view">
+            <div class="summary-header">
+                <h2>Daily Summary</h2>
+                <button id="clear-btn" class="clear-btn">Clear Daily</button>
+            </div>
+            <div class="summary">
+                <p>Total work time today: <span id="daily-total">00:00:00</span></p>
+                <p>Total break time today: <span id="break-total">00:00:00</span></p>
+                <p>Overall work time: <span id="overall-total">00:00:00</span></p>
+            </div>
+            <h3>Today's tasks</h3>
+            <ul id="today-list"></ul>
+        </div>
+
+        <div id="history-view" style="display: none;">
+            <h2>History</h2>
+            <ul id="history-dates-list"></ul>
+        </div>
+
+        <h3>All-time tasks</h3>
+        <ul id="previous-tasks-list"></ul>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
