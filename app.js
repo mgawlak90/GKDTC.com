@@ -119,6 +119,46 @@ document.addEventListener('DOMContentLoaded', () => {
         const now = Date.now();
         elapsedTime = now - startTime;
         timerDisplay.textContent = formatTime(elapsedTime);
+        saveRunningState(); // autozapis co sekundÄ™
+    };
+
+    // === Running State persistence ===
+    const saveRunningState = () => {
+        if (!timerInterval) return;
+        const runningState = {
+            task: currentTask,
+            startTime,
+            elapsedTime,
+            isBreak,
+            taskBeforeBreak
+        };
+        localStorage.setItem('runningState', JSON.stringify(runningState));
+    };
+
+    const clearRunningState = () => {
+        localStorage.removeItem('runningState');
+    };
+
+    const restoreRunningState = () => {
+        const saved = JSON.parse(localStorage.getItem('runningState'));
+        if (!saved) return;
+
+        currentTask = saved.task;
+        startTime = saved.startTime;
+        elapsedTime = saved.elapsedTime || 0;
+        isBreak = saved.isBreak;
+        taskBeforeBreak = saved.taskBeforeBreak || '';
+
+        // przywracamy nazwÄ™ zadania
+        taskNameInput.value = currentTask;
+        timerInterval = setInterval(updateTimer, 1000);
+
+        startBtn.style.display = 'none';
+        stopBtn.style.display = 'inline-block';
+        breakBtn.style.display = 'inline-block';
+        if (isBreak) {
+            breakBtn.textContent = 'Resume Task';
+        }
     };
 
     // === Core App Functions ===
@@ -132,6 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
         startBtn.style.display = 'none';
         stopBtn.style.display = 'inline-block';
         breakBtn.style.display = 'inline-block';
+
+        saveRunningState();
     };
 
     const stopTimer = () => {
@@ -153,12 +195,13 @@ document.addEventListener('DOMContentLoaded', () => {
         startBtn.style.display = 'inline-block';
         stopBtn.style.display = 'none';
         breakBtn.style.display = 'none';
+        clearRunningState();
         loadState();
     };
 
     const toggleBreak = () => {
         if (isBreak) {
-            // Poprawka: najpierw przywracamy nazwê zadania, a potem w³¹czamy stoper
+            // przywracamy nazwÄ™ zadania i wÅ‚Ä…czamy stoper
             taskNameInput.value = taskBeforeBreak;
             isBreak = false;
             breakBtn.textContent = 'Break';
@@ -178,6 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             startTime = Date.now();
             timerInterval = setInterval(updateTimer, 1000);
+            saveRunningState();
         }
     };
 
@@ -229,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const displayHistoryDetails = (date, tasks, breakTime) => {
-        historyDatesList.innerHTML = `<h3>${date}</h3><button class="btn history-btn" onclick="showTodayView()">Back</button>`;
+        historyDatesList.innerHTML = `<h3>${date}</h3><button class="btn history-btn" onclick="location.reload()">Back</button>`;
         
         const summary = document.createElement('div');
         summary.innerHTML = `<p>Total work time: ${formatTime(Object.values(tasks).reduce((sum, time) => sum + time, 0))}</p>
@@ -263,4 +307,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // === Initialization ===
     loadState();
+    restoreRunningState();
 });
