@@ -33,6 +33,35 @@ document.addEventListener('DOMContentLoaded', () => {
         return (h * 3600 + m * 60 + s) * 1000;
     };
 
+    const createTaskItem = (task, timeMs) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <span>${task}</span>
+            <span>${formatTime(timeMs)}</span>
+            <button class="remove-btn">✖</button>
+        `;
+        addTaskListeners(li, task);
+
+        // Obsługa przycisku X
+        li.querySelector('.remove-btn').addEventListener('click', (e) => {
+            e.stopPropagation(); // żeby nie odpalił dblclick na li
+            const taskTime = parseTimeToMs(li.querySelector('span:nth-child(2)').textContent);
+
+            // Odejmij czas zadania od sumy
+            dailyTotalTime -= taskTime;
+            if (dailyTotalTime < 0) dailyTotalTime = 0;
+            dailyTotalDisplay.textContent = formatTime(dailyTotalTime);
+
+            // Usuń zadanie z listy
+            li.remove();
+
+            // Zapisz nowy stan
+            saveState();
+        });
+
+        return li;
+    };
+
     const loadState = () => {
         const dailyData = JSON.parse(localStorage.getItem('dailyTasks')) || {};
 
@@ -41,9 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         todayList.innerHTML = '';
         for (const [task, time] of Object.entries(dailyData)) {
-            const li = document.createElement('li');
-            li.innerHTML = `<span>${task}</span><span>${formatTime(time)}</span>`;
-            addTaskListeners(li, task);
+            const li = createTaskItem(task, time);
             todayList.appendChild(li);
         }
     };
@@ -52,8 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const dailyData = {};
         todayList.querySelectorAll('li').forEach(li => {
             const task = li.querySelector('span:first-child').textContent;
-            const time = li.querySelector('span:last-child').textContent;
-            dailyData[task] = (dailyData[task] || 0) + parseTimeToMs(time);
+            const time = li.querySelector('span:nth-child(2)').textContent;
+            dailyData[task] = parseTimeToMs(time);
         });
         localStorage.setItem('dailyTasks', JSON.stringify(dailyData));
     };
@@ -92,13 +119,11 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 
         if (existingItem) {
-            const currentMs = parseTimeToMs(existingItem.querySelector('span:last-child').textContent);
+            const currentMs = parseTimeToMs(existingItem.querySelector('span:nth-child(2)').textContent);
             const newTime = currentMs + timeToAdd;
-            existingItem.querySelector('span:last-child').textContent = formatTime(newTime);
+            existingItem.querySelector('span:nth-child(2)').textContent = formatTime(newTime);
         } else {
-            const li = document.createElement('li');
-            li.innerHTML = `<span>${task}</span><span>${formatTime(timeToAdd)}</span>`;
-            addTaskListeners(li, task);
+            const li = createTaskItem(task, timeToAdd);
             todayList.appendChild(li);
         }
 
