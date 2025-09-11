@@ -110,11 +110,28 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            cursor: pointer;
+            gap: 10px;
         }
         
         #today-list li:hover {
             background-color: #3A3A3A;
+        }
+
+        #today-list li span:first-child {
+            flex: 1;
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #F44336;
+            font-size: 1.2rem;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .remove-btn:hover {
+            color: #FF7961;
         }
     </style>
 </head>
